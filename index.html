@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map of Iceland</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .map-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            flex: 1;
+            min-width: 300px;
+            max-width: 700px;
+        }
+
+        .map-container h2 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .map-container p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        #iceland-map {
+            width: 100%;
+            height: auto;
+        }
+
+        #iceland-map path {
+            fill: #a8d5e5;
+            stroke: #1e3c72;
+            stroke-width: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #iceland-map path:hover {
+            fill: #5bc0de;
+            transform: scale(1.02);
+            transform-origin: center;
+        }
+
+        #iceland-map path.active {
+            fill: #2a5298;
+        }
+
+        .info-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        .info-panel h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #a8d5e5;
+        }
+
+        .info-content {
+            color: #333;
+        }
+
+        .info-content.placeholder {
+            color: #888;
+            font-style: italic;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .data-value {
+            color: #555;
+        }
+
+        .region-title {
+            font-size: 1.5em;
+            color: #2a5298;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #a8d5e5 0%, #5bc0de 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .highlight-box h4 {
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .highlight-box p {
+            color: #333;
+            font-size: 14px;
+        }
+
+        footer {
+            color: white;
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .map-container, .info-panel {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🇮🇸 Interactive Map of Iceland</h1>
+    
+    <div class="container">
+        <div class="map-container">
+            <h2>Regions of Iceland</h2>
+            <p>Click on a region to see detailed information</p>
+            <svg id="iceland-map" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+                <!-- Vestfirðir (Westfjords) -->
+                <path id="vestfirdir" d="M80,80 L150,50 L200,70 L220,120 L200,180 L150,200 L100,180 L60,140 Z" data-region="vestfirdir"/>
+                
+                <!-- Norðurland vestra (Northwestern Region) -->
+                <path id="nordurland-vestra" d="M220,120 L300,80 L380,90 L400,140 L380,200 L300,210 L220,180 L200,180 Z" data-region="nordurland-vestra"/>
+                
+                <!-- Norðurland eystra (Northeastern Region) -->
+                <path id="nordurland-eystra" d="M400,140 L500,100 L600,120 L650,180 L620,250 L520,280 L420,260 L380,200 Z" data-region="nordurland-eystra"/>
+                
+                <!-- Austurland (Eastern Region) -->
+                <path id="austurland" d="M620,250 L700,220 L750,280 L740,380 L680,420 L600,400 L560,340 L520,280 Z" data-region="austurland"/>
+                
+                <!-- Suðurland (Southern Region) -->
+                <path id="sudurland" d="M200,280 L320,260 L420,260 L520,280 L560,340 L600,400 L500,450 L350,460 L220,420 L180,350 Z" data-region="sudurland"/>
+                
+                <!-- Suðurnes (Southern Peninsula) -->
+                <path id="sudurnes" d="M100,320 L180,350 L200,280 L150,300 L120,340 Z" data-region="sudurnes"/>
+                
+                <!-- Höfuðborgarsvæðið (Capital Region) -->
+                <path id="hofudborgarsvaedid" d="M150,200 L200,180 L220,180 L200,280 L180,350 L100,320 L80,260 Z" data-region="hofudborgarsvaedid"/>
+                
+                <!-- Vesturland (Western Region) -->
+                <path id="vesturland" d="M200,180 L300,210 L320,260 L200,280 Z" data-region="vesturland"/>
+            </svg>
+        </div>
+        
+        <div class="info-panel">
+            <h2>Region Information</h2>
+            <div id="info-content" class="info-content placeholder">
+                Click on a region to view its details
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2024 Interactive Iceland Map | Data sources: Statistics Iceland</p>
+    </footer>
+
+    <script>
+        // Iceland region data
+        const regionData = {
+            'vestfirdir': {
+                name: 'Vestfirðir (Westfjords)',
+                population: '7,000',
+                area: '9,409 km²',
+                capital: 'Ísafjörður',
+                description: 'The Westfjords is the most sparsely populated region of Iceland, known for its dramatic fjords, towering cliffs, and abundant wildlife including arctic foxes and puffins.',
+                highlight: 'Dynjandi Waterfall',
+                highlightDesc: 'One of the most beautiful waterfalls in Iceland, cascading 100 meters down a series of rock formations.'
+            },
+            'nordurland-vestra': {
+                name: 'Norðurland vestra (Northwestern Region)',
+                population: '7,500',
+                area: '12,737 km²',
+                capital: 'Sauðárkrókur',
+                description: 'Known for its rich Viking heritage and agricultural landscapes. This region features dramatic coastlines, hot springs, and historic sites.',
+                highlight: 'Hvítserkur Rock',
+                highlightDesc: 'A 15-meter tall basalt stack standing in Húnaflói bay, shaped like a dragon or dinosaur.'
+            },
+            'nordurland-eystra': {
+                name: 'Norðurland eystra (Northeastern Region)',
+                population: '30,000',
+                area: '21,968 km²',
+                capital: 'Akureyri',
+                description: 'The second largest urban area in Iceland. Features include Lake Mývatn, powerful waterfalls, and excellent whale watching opportunities.',
+                highlight: 'Lake Mývatn',
+                highlightDesc: 'A stunning volcanic lake surrounded by geothermal areas, lava formations, and rich birdlife.'
+            },
+            'austurland': {
+                name: 'Austurland (Eastern Region)',
+                population: '13,000',
+                area: '22,721 km²',
+                capital: 'Egilsstaðir',
+                description: "The Eastern Region is characterized by fjords, reindeer herds, and Iceland's largest forest. Known for its artistic communities and natural beauty.",
+                highlight: 'Vatnajökull Glacier',
+                highlightDesc: "Europe's largest glacier by volume, covering parts of the eastern highlands."
+            },
+            'sudurland': {
+                name: 'Suðurland (Southern Region)',
+                population: '28,000',
+                area: '24,526 km²',
+                capital: 'Selfoss',
+                description: "Home to many of Iceland's most famous attractions including the Golden Circle route, black sand beaches, and powerful waterfalls.",
+                highlight: 'Gullfoss & Geysir',
+                highlightDesc: 'The iconic Golden Circle featuring the magnificent Gullfoss waterfall and the original Geysir hot spring.'
+            },
+            'sudurnes': {
+                name: 'Suðurnes (Southern Peninsula)',
+                population: '27,000',
+                area: '829 km²',
+                capital: 'Keflavík',
+                description: "Home to Iceland's international airport and the famous Blue Lagoon. Features dramatic volcanic landscapes and geothermal activity.",
+                highlight: 'Blue Lagoon',
+                highlightDesc: 'World-famous geothermal spa with milky blue waters rich in minerals, silica, and algae.'
+            },
+            'hofudborgarsvaedid': {
+                name: 'Höfuðborgarsvæðið (Capital Region)',
+                population: '233,000',
+                area: '1,062 km²',
+                capital: 'Reykjavík',
+                description: 'The most populous region of Iceland, home to the capital city Reykjavík. A vibrant cultural hub with museums, restaurants, and nightlife.',
+                highlight: 'Hallgrímskirkja',
+                highlightDesc: "Iceland's largest church and most iconic landmark, inspired by basalt column formations."
+            },
+            'vesturland': {
+                name: 'Vesturland (Western Region)',
+                population: '16,500',
+                area: '9,554 km²',
+                capital: 'Borgarnes',
+                description: 'Features dramatic scenery including Snæfellsjökull glacier-volcano, lava caves, and hot springs. Rich in Viking saga history.',
+                highlight: 'Snæfellsnes Peninsula',
+                highlightDesc: 'Often called "Iceland in Miniature" for its diverse landscapes including glaciers, lava fields, and coastal cliffs.'
+            }
+        };
+
+        // Get all region paths
+        const regions = document.querySelectorAll('#iceland-map path');
+        const infoContent = document.getElementById('info-content');
+
+        // Add click event listeners to each region
+        regions.forEach(region => {
+            region.addEventListener('click', function() {
+                // Remove active class from all regions
+                regions.forEach(r => r.classList.remove('active'));
+                
+                // Add active class to clicked region
+                this.classList.add('active');
+                
+                // Get region data
+                const regionId = this.getAttribute('data-region');
+                const data = regionData[regionId];
+                
+                if (data) {
+                    // Update info panel with region data
+                    infoContent.classList.remove('placeholder');
+                    infoContent.innerHTML = `
+                        <div class="region-title">${data.name}</div>
+                        <p class="description">${data.description}</p>
+                        <div class="data-item">
+                            <span class="data-label">Population</span>
+                            <span class="data-value">${data.population}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Area</span>
+                            <span class="data-value">${data.area}</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Capital</span>
+                            <span class="data-value">${data.capital}</span>
+                        </div>
+                        <div class="highlight-box">
+                            <h4>🌟 ${data.highlight}</h4>
+                            <p>${data.highlightDesc}</p>
+                        </div>
+                    `;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

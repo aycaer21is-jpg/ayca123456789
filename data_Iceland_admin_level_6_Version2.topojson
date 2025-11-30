@@ -1,0 +1,17 @@
+/* PLACEHOLDER: Replace this file's contents with your full Iceland_admin_level_6.topojson Topology JSON.
+   Example: paste the entire TopoJSON text here. Keep the filename exactly:
+   data/Iceland_admin_level_6.topojson
+
+   NOTE: The site expects at least one object in topo.objects; the renderer picks the first object found.
+*/
+{
+  "type": "Topology",
+  "objects": {
+    "placeholder": {
+      "type": "GeometryCollection",
+      "geometries": []
+    }
+  },
+  "arcs": [],
+  "transform": {}
+}
